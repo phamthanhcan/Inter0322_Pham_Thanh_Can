@@ -1,4 +1,4 @@
- create database QL_Furama;
+create database QL_Furama;
 
 use QL_Furama;
 
@@ -84,11 +84,14 @@ create table hop_dong(
     ngay_ket_thuc datetime,
     tien_dat_coc double,
     ma_nhan_vien int,
-    constraint fk_hopdong_nhanvien foreign key (ma_nhan_vien) references nhan_vien(ma_nhan_vien),
+    constraint fk_hopdong_nhanvien foreign key (ma_nhan_vien) references nhan_vien(ma_nhan_vien)
+    ON DELETE SET NULL,
     ma_khach_hang int,
-	constraint fk_hopdong_khachhang foreign key (ma_khach_hang) references khach_hang(ma_khach_hang),
+	constraint fk_hopdong_khachhang foreign key (ma_khach_hang) references khach_hang(ma_khach_hang)
+    ON DELETE SET NULL,
     ma_dich_vu int,
     constraint fk_hopdong_dichvu foreign key (ma_dich_vu) references dich_vu(ma_dich_vu)
+    ON DELETE SET NULL
 );
 
 create table dich_vu_di_kem(
@@ -102,9 +105,11 @@ create table dich_vu_di_kem(
 create table hop_dong_chi_tiet(
 	ma_hop_dong_chi_tiet int primary key,
     ma_hop_dong int,
-    constraint fk_hopdongchitiet_hopdong foreign key (ma_hop_dong) references hop_dong(ma_hop_dong),
+    constraint fk_hopdongchitiet_hopdong foreign key (ma_hop_dong) references hop_dong(ma_hop_dong)
+    ON DELETE SET NULL,
     ma_dich_vu_di_kem int,
-    constraint fk_hopdongchitiet_dvdikem foreign key (ma_dich_vu_di_kem) references dich_vu_di_kem(ma_dich_vu_di_kem),
+    constraint fk_hopdongchitiet_dvdikem foreign key (ma_dich_vu_di_kem) references dich_vu_di_kem(ma_dich_vu_di_kem)
+    ON DELETE SET NULL,
     so_luong int
 );
 
@@ -306,11 +311,17 @@ where year(hop_dong.ngay_lam_hop_dong) = '2020'
 group by hop_dong.ma_hop_dong;
 
 -- cau 13
+create temporary table temp1
 select a.ma_dich_vu_di_kem, ten_dich_vu_di_kem, sum(b.so_luong) as so_luong_dich_vu_di_kem
 from dich_vu_di_kem a
 inner join hop_dong_chi_tiet b on a.ma_dich_vu_di_kem = b.ma_dich_vu_di_kem
 group by a.ma_dich_vu_di_kem
 order by so_luong_dich_vu_di_kem desc;
+
+create temporary table temp2 
+select * from temp1;
+
+select * from temp1 where temp1.so_luong_dich_vu_di_kem = (select max(temp2.so_luong_dich_vu_di_kem) from temp2);
 
 -- cau 14
 select hop_dong.ma_hop_dong, loai_dich_vu.ten_loai_dich_vu, dich_vu_di_kem.ten_dich_vu_di_kem, count(dich_vu_di_kem.ma_dich_vu_di_kem) as so_lan_su_dung 
@@ -338,6 +349,36 @@ where so_hop_dong_nhan_vien.so_hop_dong <=3;
 -- cau 16 
 delete from nhan_vien where not exists (
 select ma_nhan_vien from hop_dong where ma_nhan_vien = nhan_vien.ma_nhan_vien and year(ngay_lam_hop_dong) >= 2019 and year(ngay_lam_hop_dong) <= 2021
-)
+);
+
+-- cau 17
+update khach_hang set ma_loai_khach = 1 where khach_hang.ma_khach_hang in 
+(select c.ma_khach_hang from 
+(select khach_hang.ma_khach_hang from khach_hang inner join 
+	(select hop_dong.ma_khach_hang, sum(dich_vu.chi_phi_thue + hop_dong_chi_tiet.so_luong * dich_vu_di_kem.gia) as tong_thanh_toan from hop_dong
+		inner join hop_dong_chi_tiet on hop_dong_chi_tiet.ma_hop_dong = hop_dong.ma_hop_dong
+        inner join dich_vu_di_kem on dich_vu_di_kem.ma_dich_vu_di_kem = hop_dong_chi_tiet.ma_dich_vu_di_kem
+		inner join dich_vu on dich_vu.ma_dich_vu = hop_dong.ma_dich_vu and year(ngay_lam_hop_dong) = 2021 
+		group by ma_khach_hang) as thanh_toan_2021 on thanh_toan_2021.ma_khach_hang = khach_hang.ma_khach_hang and tong_thanh_toan > 10000000 and khach_hang.ma_loai_khach = 2) as c
+);
+
+-- cau 18
+delete from khach_hang where khach_hang.ma_khach_hang in (select hop_dong.ma_khach_hang from hop_dong where year(ngay_lam_hop_dong) < 2021);
+
+-- cau 19
+update dich_vu_di_kem set gia = gia*2 where ma_dich_vu_di_kem in 
+(select a.ma_dich_vu_di_kem from 
+	(select ma_dich_vu_di_kem, sum(so_luong) as soluong from hop_dong_chi_tiet 
+	inner join hop_dong on hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong and year(ngay_lam_hop_dong) = 2020 
+	group by ma_dich_vu_di_kem
+	having soluong > 10) as a);
+
+-- cau 20
+select ma_nhan_vien as id, ho_ten, email, so_dien_thoai, ngay_sinh, dia_chi  
+from nhan_vien 
+    union all
+    select 	ma_khach_hang, ho_ten, email, so_dien_thoai, ngay_sinh, dia_chi 
+	from khach_hang
+
 
 
