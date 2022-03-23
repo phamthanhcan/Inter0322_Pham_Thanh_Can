@@ -84,7 +84,7 @@ returns int
 deterministic
 	begin
 		declare result int;
-        set result = (select max(datediff(ngay_ket_thuc, ngay_lam_hop_dong)) from hop_dong where ma_khach_hang = ma_kh);
+        set result = concat((select max(datediff(ngay_ket_thuc, ngay_lam_hop_dong)) from hop_dong where ma_khach_hang = ma_kh), ' ngày');
         return result;
     end;
 // delimiter ;
