@@ -49,7 +49,11 @@ delimiter //
 	begin 
 		declare total int;
         set total = (select count(*) from hop_dong);
+<<<<<<< Updated upstream
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = total;
+=======
+		SIGNAL SQLSTATE '27000' SET MESSAGE_TEXT = total;
+>>>>>>> Stashed changes
 	end;
 // delimiter ;
 
@@ -57,6 +61,7 @@ drop trigger tr_xoa_hop_dong;
 
 delete from hop_dong where hop_dong.ma_hop_dong = 2;
 
+<<<<<<< Updated upstream
 -- cau 26
 delimiter //
 create trigger tr_cap_nhat_hop_dong 
@@ -73,6 +78,8 @@ drop trigger tr_cap_nhat_hop_dong;
 
 update hop_dong set ngay_ket_thuc = '2020-07-15' where ma_hop_dong = 2;
 
+=======
+>>>>>>> Stashed changes
 -- cau 27
 -- cau a
 delimiter // 
@@ -96,15 +103,24 @@ select func_dem_dich_vu () as tong_dich_vu_sd_tren_2tr;
 -- cau b
 delimiter //
 create function func_tinh_thoi_gian_hop_dong(ma_kh int)
+<<<<<<< Updated upstream
 returns varchar(50)
 deterministic
 	begin
 		declare result varchar(50);
         set result = concat((select max(datediff(ngay_ket_thuc, ngay_lam_hop_dong)) from hop_dong where ma_khach_hang = ma_kh), ' ngày') ;
+=======
+returns int
+deterministic
+	begin
+		declare result int;
+        set result = (select max(datediff(ngay_ket_thuc, ngay_lam_hop_dong)) from hop_dong where ma_khach_hang = ma_kh);
+>>>>>>> Stashed changes
         return result;
     end;
 // delimiter ;
 
+<<<<<<< Updated upstream
 select func_tinh_thoi_gian_hop_dong(5) as thoi_gian_hop_dong_dai_nhat;
 
 -- cau 28
@@ -123,3 +139,6 @@ begin
     delete from dich_vu where ma_dich_vu in (select ma_dich_vu from temp_table);
 end; 
 // delimiter ;
+=======
+select func_tinh_thoi_gian_hop_dong(5) as thoi_gian_hop_dong_dai_nhat
+>>>>>>> Stashed changes
