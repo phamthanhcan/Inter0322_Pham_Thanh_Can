@@ -1,5 +1,6 @@
 package services.impl;
 
+import controller.FuramaController;
 import models.Customer;
 import models.Employee;
 import services.CustomerService;
@@ -27,20 +28,11 @@ public class CustomerServiceImpl implements CustomerService {
     public void addNew() {
         System.out.println("-----------THÊM MỚI KHÁCH HÀNG------------");
         System.out.print("Nhập id: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         System.out.print("Nhập tên: ");
         String name = sc.nextLine();
         System.out.print("Nhập ngày sinh: ");
-        String b = sc.nextLine();
-        Date birthDate = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        df.setLenient(false); //set false để kiểm tra tính hợp lệ của date. Vd: tháng 2 phải có 28,29 ngày, 1 năm phải có 12 tháng,...
-        try{
-            birthDate = df.parse(b); // parse dateString thành kiểu Date
-        }
-        catch (ParseException e) { //Quăng lỗi nếu date không hợp lệ
-            System.out.println("Invalid date");
-        }
+        Date birthDate = FuramaController.tryCatchBirth();
         System.out.print("Nhập giới tính: ");
         String sex = sc.nextLine();
         System.out.print("Nhập số cmnd: ");
@@ -62,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void edit() {
         System.out.println("Nhập id khách hàng cần chỉnh sửa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         int sizeListE = listC.size();
         boolean check = false;
 
@@ -71,7 +63,6 @@ public class CustomerServiceImpl implements CustomerService {
                 check = true;
                 System.out.println("Tìm thấy khách hàng cần chỉnh sửa:");
                 System.out.println(listC.get(i));
-                int choiceNumber;
                 int newId;
                 String newName, newSex, newIdentityCardNumber, newPhoneNumber, newEmail, newAddress, newTypeCustomer;
                 Date newBirthDate;
@@ -90,15 +81,11 @@ public class CustomerServiceImpl implements CustomerService {
                     System.out.println("10. Nhập lại tất cả thông tin");
                     System.out.println("11. Trở lại");
 
-                    do{
-                        System.out.println("Chọn thông tin cần chỉnh sửa: ");
-                        choiceNumber = Integer.parseInt(sc.nextLine());
-                    }while(choiceNumber < 1 || choiceNumber > 13);
 
-                    switch (choiceNumber){
+                    switch (FuramaController.tryCatchCheckNumberMenu()){
                         case 1:
                             System.out.print("Nhập id mới: ");
-                            newId = Integer.parseInt(sc.nextLine());
+                            newId = FuramaController.tryCatchNumber();
                             listC.get(i).setId(newId);
                             System.out.println("Đã cập nhật thành công!");
                             break;
@@ -110,15 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
                             break;
                         case 3:
                             System.out.print("Nhập ngày sinh mới: ");
-                            String b = sc.nextLine();
-                            newBirthDate = new Date();
-                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-                            df.setLenient(false);
-                            try {
-                                newBirthDate = df.parse(b);
-                            } catch (ParseException parseException) {
-                                System.out.println("Lỗi định dạng ngày tháng năm!");
-                            }
+                            newBirthDate = FuramaController.tryCatchBirth();
                             listC.get(i).setBirthDay(newBirthDate);
                             System.out.println("Đã cập nhật thành công!");
                             break;
@@ -160,20 +139,11 @@ public class CustomerServiceImpl implements CustomerService {
                             break;
                         case 10:
                             System.out.print("Nhập id: ");
-                            newId = Integer.parseInt(sc.nextLine());
+                            newId = FuramaController.tryCatchNumber();
                             System.out.print("Nhập tên: ");
                             newName = sc.nextLine();
                             System.out.print("Nhập ngày sinh: ");
-                            String a = sc.nextLine();
-                            newBirthDate = new Date();
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                            dateFormat.setLenient(false); //set false để kiểm tra tính hợp lệ của date. Vd: tháng 2 phải có 28,29 ngày, 1 năm phải có 12 tháng,...
-                            try{
-                                newBirthDate = dateFormat.parse(a); // parse dateString thành kiểu Date
-                            }
-                            catch (ParseException ex) { //Quăng lỗi nếu date không hợp lệ
-                                System.out.println("Invalid date");
-                            }
+                            newBirthDate = FuramaController.tryCatchBirth();
                             System.out.print("Nhập giới tính: ");
                             newSex = sc.nextLine();
                             System.out.print("Nhập số cmnd: ");
@@ -195,6 +165,8 @@ public class CustomerServiceImpl implements CustomerService {
                         case 11:
                             System.out.println("Quay trở lại MENU chính");
                             return;
+                        default:
+                            System.out.println("Bạn phải nhập đúng số trên MENU!");
                     }
                 }
 
@@ -211,7 +183,7 @@ public class CustomerServiceImpl implements CustomerService {
         int sizeListC = listC.size();
         boolean check = false;
         System.out.print("Nhập vào id khách hàng cần xóa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         for (int i = 0; i<sizeListC; i++) {
             if(listC.get(i).getId() == id) {
                 listC.remove(listC.get(i));
@@ -224,4 +196,4 @@ public class CustomerServiceImpl implements CustomerService {
             System.out.println("Không tìm thấy khách hàng với mã id là : "+id);
         }
     }
-}
+};

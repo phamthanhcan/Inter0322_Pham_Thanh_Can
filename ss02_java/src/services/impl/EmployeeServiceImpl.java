@@ -1,7 +1,9 @@
 package services.impl;
 
+import controller.FuramaController;
 import models.Employee;
 import services.EmployeeService;
+import utils.ReadAndWrite;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +18,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void display() {
+        listE = (List<Employee>) ReadAndWrite.read("C:\\CAN\\Inter0322_Pham_Thanh_Can\\ss02_java\\src\\data\\employee.csv");
         System.out.println("--------DANH SÁCH NHÂN VIÊN-------");
         for (Employee e : listE) {
             System.out.println(e.toString());
@@ -26,20 +29,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void addNew() {
         System.out.println("-------------THÊM MỚI KHÁCH HÀNG--------------");
         System.out.print("Nhập id: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         System.out.print("Nhập tên: ");
         String name = sc.nextLine();
         System.out.print("Nhập ngày sinh: ");
-        String b = sc.nextLine();
-        Date birthDate = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        df.setLenient(false); //set false để kiểm tra tính hợp lệ của date. Vd: tháng 2 phải có 28,29 ngày, 1 năm phải có 12 tháng,...
-        try{
-            birthDate = df.parse(b); // parse dateString thành kiểu Date
-        }
-        catch (ParseException e) { //Quăng lỗi nếu date không hợp lệ
-            System.out.println("Invalid date");
-        }
+        Date birthDate = FuramaController.tryCatchBirth();
         System.out.print("Nhập giới tính: ");
         String sex = sc.nextLine();
         System.out.print("Nhập số cmnd: ");
@@ -55,17 +49,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         System.out.print("Nhập vị trí: ");
         String position = sc.nextLine();
         System.out.print("Nhập lương: ");
-        long salary = Long.parseLong(sc.nextLine());
+        long salary = FuramaController.tryCatchLong();
 
-        Employee e = new Employee(id, name, birthDate, sex, identityCardNumber, phoneNumber, email,address, level, position, salary);
+        Employee e = new Employee(id, name, birthDate, sex, identityCardNumber, phoneNumber, email, address, level, position, salary);
         listE.add(e);
         System.out.println("Đã thêm mới nhân viên thành công!");
+        ReadAndWrite.write(listE, "C:\\CAN\\Inter0322_Pham_Thanh_Can\\ss02_java\\src\\data\\employee.csv");
     }
-
     @Override
     public void edit() {
         System.out.println("Nhập id nhân viên cần chỉnh sửa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         int sizeListE = listE.size();
         boolean check = false;
 
@@ -95,15 +89,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                     System.out.println("12. Nhập lại tất cả thông tin");
                     System.out.println("13. Trở lại");
 
-                    do{
-                        System.out.println("Chọn thông tin cần chỉnh sửa: ");
-                        choiceNumber = Integer.parseInt(sc.nextLine());
-                    }while(choiceNumber < 1 || choiceNumber > 13);
-
-                    switch (choiceNumber){
+                    switch (FuramaController.tryCatchCheckNumberMenu()){
                         case 1:
                             System.out.print("Nhập id mới: ");
-                            newId = Integer.parseInt(sc.nextLine());
+                            newId = FuramaController.tryCatchNumber();
                             listE.get(i).setId(newId);
                             System.out.println("Đã cập nhật thành công!");
                             break;
@@ -115,15 +104,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                             break;
                         case 3:
                             System.out.print("Nhập ngày sinh mới: ");
-                            String b = sc.nextLine();
-                            newBirthDate = new Date();
-                            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-                            df.setLenient(false);
-                            try {
-                                newBirthDate = df.parse(b);
-                            } catch (ParseException parseException) {
-                                System.out.println("Lỗi định dạng ngày tháng năm!");
-                            }
+                            newBirthDate = FuramaController.tryCatchBirth();
                             listE.get(i).setBirthDay(newBirthDate);
                             System.out.println("Đã cập nhật thành công!");
                             break;
@@ -171,26 +152,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                             break;
                         case 11:
                             System.out.print("Nhập lương mới: ");
-                            newSalary = Long.parseLong(sc.nextLine());
+                            newSalary = FuramaController.tryCatchLong();
                             listE.get(i).setSalary(newSalary);
                             System.out.println("Đã cập nhật thành công!");
                             break;
                         case 12:
                             System.out.print("Nhập id: ");
-                            newId = Integer.parseInt(sc.nextLine());
+                            newId = FuramaController.tryCatchNumber();
                             System.out.print("Nhập tên: ");
                             newName = sc.nextLine();
                             System.out.print("Nhập ngày sinh: ");
-                            String a = sc.nextLine();
-                            newBirthDate = new Date();
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                            dateFormat.setLenient(false); //set false để kiểm tra tính hợp lệ của date. Vd: tháng 2 phải có 28,29 ngày, 1 năm phải có 12 tháng,...
-                            try{
-                                newBirthDate = dateFormat.parse(a); // parse dateString thành kiểu Date
-                            }
-                            catch (ParseException ex) { //Quăng lỗi nếu date không hợp lệ
-                                System.out.println("Invalid date");
-                            }
+                            newBirthDate = FuramaController.tryCatchBirth();
                             System.out.print("Nhập giới tính: ");
                             newSex = sc.nextLine();
                             System.out.print("Nhập số cmnd: ");
@@ -206,7 +178,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                             System.out.print("Nhập vị trí: ");
                             newPosition = sc.nextLine();
                             System.out.println("Nhập lương: ");
-                            newSalary = Long.parseLong(sc.nextLine());
+                            newSalary = FuramaController.tryCatchLong();
                             listE.get(i).setId(newId); listE.get(i).setName(newName); listE.get(i).setBirthDay(newBirthDate);
                             listE.get(i).setSex(newSex); listE.get(i).setIdentityCardNumber(newIdentityCardNumber);
                             listE.get(i).setPhoneNumber(newPhoneNumber); listE.get(i).setEmail(newEmail); listE.get(i).setAddress(newAddress);
@@ -231,7 +203,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void delete() {
         display();
         System.out.println("Nhập id nhân viên cần xóa: ");
-        int id = Integer.parseInt(sc.nextLine());
+        int id = FuramaController.tryCatchNumber();
         int size = listE.size();
         boolean check = false;
 
